@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Thank you — Pizza Step</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 520px;
+        margin: 80px auto;
+        text-align: center;
+        color: #222;
+      }
+      .icon {
+        font-size: 56px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="icon" id="icon">⏳</div>
+    <h1 id="title">Confirming your payment…</h1>
+    <p id="details"></p>
+    <a href="/">Back to the menu</a>
+
+    <script>
+      // Don't trust the URL parameters — ask OUR server, which asks StepPay.
+      const orderId = new URLSearchParams(location.search).get("order_id");
+      fetch("/api/orders/" + encodeURIComponent(orderId))
+        .then((r) => r.json())
+        .then((order) => {
+          const ok = order.status === "approved";
+          document.getElementById("icon").textContent = ok ? "✅" : "❌";
+          document.getElementById("title").textContent = ok ? "Thank you! Your pizza is on the way." : "Payment " + (order.status || "not found");
+          document.getElementById("details").textContent = order.amount ? `Order ${order.order_id} · ${(order.amount / 100).toFixed(2)} GEL` : "";
+        });
+    </script>
+  </body>
+</html>

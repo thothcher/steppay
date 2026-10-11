@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pizza Step — secure checkout</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 640px;
+        margin: 40px auto;
+        padding: 0 16px;
+        color: #222;
+      }
+      li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+      }
+      li span {
+        flex: 1;
+      }
+      input {
+        width: 56px;
+        padding: 6px;
+      }
+      button {
+        margin-top: 20px;
+        padding: 14px 20px;
+        border: 0;
+        border-radius: 10px;
+        background: #0e8653;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🍕 Pizza Step</h1>
+    <p>The browser only sends <b>what</b> you ordered. The server decides the price and signs the payment.</p>
+    <ul id="menu"></ul>
+    <button id="pay">Checkout</button>
+
+    <script>
+      let menu = {};
+      fetch("/api/menu")
+        .then((r) => r.json())
+        .then((data) => {
+          menu = data;
+          document.getElementById("menu").innerHTML = Object.entries(menu)
+            .map(
+              ([id, m]) =>
+                `<li><span>${m.name} — ${(m.price / 100).toFixed(2)} GEL</span><input type="number" min="0" value="0" data-id="${id}"></li>`,
+            )
+            .join("");
+        });
+
+      document.getElementById("pay").onclick = async () => {
+        const items = [...document.querySelectorAll("input[data-id]")]
+          .map((input) => ({ id: input.dataset.id, qty: Number(input.value) }))
+          .filter((i) => i.qty > 0);
+        const res = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items }),
+        });
+        const data = await res.json();
+        if (data.checkout_url)
+          location.href = data.checkout_url; // → StepPay checkout
+        else alert(data.error);
+      };
+    </script>
+  </body>
+</html>

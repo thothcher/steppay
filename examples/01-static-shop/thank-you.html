@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Thank you — Pizza Step</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="result">
+      <div id="icon" class="icon">⏳</div>
+      <h1 id="title">Checking your payment…</h1>
+      <p id="details"></p>
+      <a href="index.html" class="back">Back to the menu</a>
+    </main>
+
+    <script>
+      // The result arrives in the address bar: ?order_status=approved&order_id=...&amount=...
+      const r = Object.fromEntries(new URLSearchParams(location.search));
+      const amount = r.amount ? (Number(r.amount) / 100).toFixed(2) + " " + r.currency : "";
+
+      if (!r.order_status) {
+        document.getElementById("title").textContent = "No payment information";
+      } else if (r.order_status === "approved") {
+        localStorage.removeItem("cart");
+        document.getElementById("icon").textContent = "✅";
+        document.getElementById("title").textContent = "Thank you! Your pizza is on the way.";
+        document.getElementById("details").textContent = `Paid ${amount} · order ${r.order_id} · card ${r.masked_card || ""}`;
+      } else {
+        document.getElementById("icon").textContent = "❌";
+        document.getElementById("title").textContent = "Payment " + r.order_status;
+        document.getElementById("details").textContent = r.response_description || "Please try again.";
+      }
+      // ⚠ Anyone can type these parameters by hand. A real shop confirms the
+      //   payment on its server (callback or status API) — see example 02.
+    </script>
+  </body>
+</html>

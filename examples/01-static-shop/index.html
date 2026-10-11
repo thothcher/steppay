@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pizza Step — online restaurant</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>🍕 Pizza Step</h1>
+      <p>Hot pizza delivered in 30 minutes</p>
+    </header>
+
+    <main>
+      <section id="menu" class="menu"></section>
+
+      <aside class="cart">
+        <h2>Your order</h2>
+        <ul id="cart-items"></ul>
+        <p class="total">Total: <b id="cart-total">0.00</b></p>
+        <label><input type="checkbox" id="popup" checked /> Pay in a popup</label>
+        <button id="pay-btn" disabled>Pay</button>
+        <p class="hint">Test card: 4242 4242 4242 4242 · 12/30 · 123</p>
+      </aside>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
